@@ -1,0 +1,252 @@
+\documentclass[11pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{dialogue}
+\usepackage{pdfpages}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{Alors}}
+\renewcommand{\algorithmicelse}{\textbf{Sinon}}
+\renewcommand{\algorithmicfor}{\textbf{Pour}}
+\renewcommand{\algorithmicforall}{\textbf{Pour chaque}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{Tant que}}
+\renewcommand{\algorithmicreturn}{\textbf{Retourner}}
+
+
+\def\C{\mathbb{C}}
+ \parskip 5mm
+ \parindent 5mm
+ \definecolor{Green}{RGB}{20,127,50}
+ \definecolor{Red}{RGB}{150,50,50}
+\definecolor{orange}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0.1,0.2,0.6}
+\definecolor{mauve}{rgb}{0.58,0.5,0.62}
+ \geometry{top=40mm, bottom=15mm, left=30mm , right=25mm}
+ 
+ \hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+ 
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C++,
+  showstringspaces=false,
+  tabsize=2,
+  basicstyle=\footnotesize,
+  keywordstyle=\bfseries\color{Green},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  commentstyle=\footnotesize\ttfamily\color{mauve},
+}
+
+
+\newcommand{\intervalle}[2]{\mathopen{[}#1\,;#2\mathclose{]}}
+\newcommand{\reelplus}{$\mathopen{[}0\,;+\infty\mathclose{[}$}
+\newcommand{\reelmoins}{$\mathopen{]}-\infty\,;0\mathclose{]}$}
+\newcommand{\reel}{$\mathopen{]}-\infty\,;+\infty\mathclose{[}$}
+\author{\textcolor{Green}{Firegreen}}
+\title{\textcolor{Green}{\textbf{Maths}}}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\geometry{top=20mm, bottom=15mm, left=30mm , right=25mm}
+\begin{document}
+\begin{minipage}[t]{0.3\paperwidth}
+\begin{flushleft}
+\raisebox{-0.5\height}{\includegraphics[width=0.15\paperwidth]{imac}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\paperwidth}
+\begin{flushright}
+\noindent \Huge{Algorithmique Avancé} \\
+\noindent \LARGE{TP 4} \\
+\noindent \Large{Tas et Codage de Huffman}
+\end{flushright}
+\end{minipage}\\
+\begin{center}
+\rule{\textwidth}{0.2cm}
+\end{center}
+Le \textbf{tas} est une structure binaire basé sur la priorité que l'on peut implémenter à l'aide d'un tableau qu'on appel aussi \textbf{file de priorité} (\textit{Priority Queue}).
+  
+\section{Tas}
+\subsection{Principe}
+Il s'agit d'une structure binaire comme l'arbre de recherche mais contrairement à lui les éléments les plus grands ne se trouvent pas dans la partie de droite mais dans les niveaux les plus hauts. Chaque noeud est \textbf{plus grand que ses enfants}.\\
+Le tas est aussi un \textbf{arbre complet}, chaque noeud qui n'est pas une feuille a exactement deux enfants sauf ceux du niveau $h-1$ (l'avant-dernier). Lorsqu'on insère un noeud dans le tas, on doit d'abord compléter le noeud $h-1$ incomplet le plus à droite.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{heap_tree}
+\end{center}
+\caption{Exemple de tas}
+\end{figure}
+C'est cette propriété qui nous permet d'utiliser un tableau pour représenter cette structure. Un arbre complet peut être lu comme un livre, de haut en bas et pour chaque ligne de gauche à droite. Chaque noeud à l'indice $i$ peut avoir un fils gauche à l'indice $i \times 2+1$ et un fils droit $i \times 2+2$.
+Pour l'exemple ci-dessus, on obtient le tableau suivant $[ 20, 18, 13, 12, 8, 10, 11, 2, 5, 3 ]$.
+\subsection{Algorithme}
+Pour créer un tas, on insère progressivement chaque noeud.
+Pour chaque noeud à insérer:\\
+\begin{algorithm}[H]
+\caption{Insertion d'un noeud dans un tas}\label{node_insertion}
+\begin{algorithmic} % enter the algorithmic environment
+    \State \textit{heap} $\Leftarrow $ Tas de taille $n$
+    \State \textit{value} $\Leftarrow $ Valeur à insérer
+    \State \textit{i} $\Leftarrow n$
+    \State \textit{heap[i]} $\Leftarrow $ value
+   	\While{$\textit{i} > 0$ et \textit{heap[i]} > \textit{heap[}$\frac{\textit{i}-1}{2}$\textit{]}}
+		\State $swap$(\textit{heap[i]}, \textit{heap[}$\frac{\textit{i}-1}{2}$\textit{]})	    
+		\State \textit{i} $\Leftarrow \frac{\textit{i}-1}{2}$
+	\EndWhile
+\end{algorithmic}
+\end{algorithm}
+Une variante de cet algorithme permet de mettre à jour un nœud d'un tas pour qu'il reste plus grand que ses enfants.
+\begin{algorithm}[H]
+\caption{Mis à jour d'un tas à partir d'un noeud ($heapify$)}\label{heapify}
+\begin{algorithmic} % enter the algorithmic environment
+    \State \textit{heap} $\Leftarrow $ Tas de taille $n$
+    \State \textit{i} $\Leftarrow $ indice de la racine
+   	\State \textit{largest} $\Leftarrow $ indice de la valeur la plus grande entre le nœud i et ses enfants
+   	\If{$\textit{largest} \neq \textit{i}$}
+   		\State $swap$(\textit{heap[i]}, \textit{heap[largest]})
+   		\State $heapify$(heap, $n$, largest)
+   	\EndIf
+\end{algorithmic}
+\end{algorithm}
+Cette algorithme ne fonctionne que si les enfants du nœud en question sont des tas ou des feuilles.\\
+A partir de cet algorithme et du postulat que la racine d'un tas est toujours la plus grande valeur, on peut concevoir un tri.
+\begin{algorithm}[H]
+\caption{Tri par tas}\label{heap_sort}
+\begin{algorithmic} % enter the algorithmic environment
+	\State \textit{heap} $\Leftarrow $ tas créé à partir d'un tableau de $n$ nombres aléatoires
+    \For{\textit{i} allant de $n-1$ à 0}
+    	\State $swap$(\textit{heap[0]}, \textit{heap[i]})
+    	\State $heapify$(\textit{heap}, \textit{i}, 0)
+    \EndFor
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\section{Codage de Huffman}
+Le codage de Huffman est un moyen de compresser des données. Un caractère est un entier non-signé codé sur 8 bits (1 octet). Cet entier est un peu comme un identifiant qui permet à un programme de savoir quel caractère il doit afficher. David a proposé un moyen pour identifier un caractère avec moins de 8 bits. \\
+Cette méthode de compression se base sur un arbre binaire qui va servir de dictionnaire. C'est cette arbre qui va savoir quel caractère correspond à quel code.\\
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{huffman}
+\end{center}
+\caption{Exemple de dictionnaire de Huffman pour "YOLO"}
+\end{figure}
+Prenons un cas simple, "YOLO", ici l'arbre a trois feuilles correspondant chacune à une lettre ayant une occurrence dans notre chaine de caractères. Chaque feuille a un code ("1, "01", "00"), ce code représente le chemin parcouru pour arriver jusqu'à la feuille en question. Pour décoder une chaine codée, on part de la racine et on regarde la composition du code, pour chaque \textbf{'1'} rencontré \textbf{on choisi l'enfant de droite sinon on choisi celui de gauche}, lorsqu'on tombe sur une feuille on obtient un caractère et on repart de la racine. \\
+Ainsi en utilisant le dictionnaire ci-dessus, le décodage de "001011" donne "YOLO". \\
+Bien sûr, ici on a un cas assez simple où la chaine de caractère crée un dictionnaire avec des codes de 2 bits, mais prenons le pire cas possible où chaque lettre du codage ASCII est représenté, on se retrouve avec \textbf{256 feuilles et donc $log_2(256)$ niveaux soit 8 niveaux}. Donc dans le pire des cas on se retrouve avec un codage sur 8 bits qui n'offre aucune compression. On peut cependant crée un dictionnaire optimal qui permet de trouver rapidement un caractère avec une occurrence forte. Dans l'exemple de "YOLO", le 'O' se trouve un niveau au dessus que les autres du fait de son occurrence de 2, ainsi les 'O' de "YOLO" sont codés sur 2 bits plutôt que 4. 
+
+\section{TP}
+\noindent
+Implémenter les méthodes de la structure $Heap$ pour construire un tas et implémenter un tri par tas:
+\begin{itemize}
+\item[ - \textbf{leftChild}(int $nodeIndex$)]: retourne l'index du fils gauche du nœud à l'indice $nodeIndex$.
+\item[ - \textbf{rightChild}(int $nodeIndex$)]: retourne l'index du fils droit du nœud à l'indice $nodeIndex$.
+\item[ - \textbf{insertHeapNode}(int $heapSize$, int $value$)]: insère un nouveau noeud dans le tas $heap$ tout en gardant la propriété de tas.
+\item[ - \textbf{heapify}(int $heapSize$, int $nodeIndex$)]: Si le noeud à l'indice $nodeIndex$ n'est pas supérieur à ses enfants, reconstruit le tas à partir de cette index.
+\item[ - \textbf{buildHeap}(Array $numbers$)]: Construit un tas à partir des valeurs de $numbers$ (vous pouvez utiliser soit \textbf{insertHeapNode} soit \textbf{heapify})
+\item[ - \textbf{heapSort}()]: Construit un tableau trié à partir d'un tas $heap$
+\end{itemize}
+Implémenter les fonctions suivantes pour implémenter un codage de Huffman:
+\begin{itemize}
+
+\item[ - \textbf{charFrequences}(string $data$, Array $frequences$)]: Rempli chaque case $i$ de $frequences$ avec le nombre d'apparition du caractère correspondant au code ASCII $i$ dans la chaine de caractère $data$.
+\item[ - \textbf{huffmanHeap}(Array $frequences$, HuffmanHeap $heap$)]: Construit un tas $heap$ minimum à partir des fréquences d'apparition non nulles de caractères. Un tas minimum est un tas qui donne la priorité aux valeurs les plus basses $\rightarrow$ chaque nœud est plus petit que ses fils.
+\item[ - \textbf{huffmanDict}(HuffmanHeap $heap$, HuffmanNode* $tree$)]: Construit un dictionnaire de Huffman.
+\item[ - \textbf{huffmanEncode}(HuffmanNode** $characters$, string $toEncode$)]: Retourne la chaine de caractère encodé à partir des codes se trouvant dans $characters$. $characters$ est un tableau de HuffmanNode*, chaque indice $i$ correspond au code ASCII $i$. 
+\item[ - \textbf{huffmanDecode}(HuffmanNode* $dict$, string $toDecode$)]: Retourne la chaine de caractère décodé partir du dictionnaire $dict$
+\end{itemize}
+Pour faire fonctionner ces fonctions vous aurez besoin d'une structure \textit{HuffmanHeap} et \textit{HuffmanNode}.\\
+\textit{HuffmanNode} est un noeud d'arbre possédant les attributs $character$, $value$ et $code$ qui sont respectivement le caractère représentant le noeud, la fréquence d'apparition de ce caractères et le code produit par le dictionnaire. \\
+HuffmanHeap est un tas de HuffmanNode utilisant $value$ (la fréquence d'un caractères) pour les ordonner.
+\begin{itemize}
+\item[ - \textbf{insertHeapNode}(HuffmanHeap $heap$, int $heapSize$, char $character$, int $frequence$)]: Insère un nouveau HuffmanNode dans le tas en utilisant $frequence$ comme priorité. Le nouveau noeud est constitué de $character$ et $frequence$.
+\item[ - \textbf{insertNode}(HuffmanNode $tree$, HuffmanNode $node$)]: insère un nouveau noeud dans $tree$ en considérant les règles suivants:
+\begin{itemize}
+\item les feuilles de l'arbre sont des HuffmanNode correspondant à un caractères unique et dont la valeur correspond à la fréquence d'apparition de ce caractère.
+\item les parents sont des \textit{HuffmanNode} avec pour caractère le caractère nul ('\textbackslash0') et pour valeur la somme des valeurs de ses enfants.
+\item On considère que $tree$ est un noeud parent correctement configuré
+\item Si le nouveau noeud est 2 fois plus petit que $tree$ alors il s'insère à gauche
+\item Sinon il s'insère à droite
+\item \textbf{/!\textbackslash} Si le nouveau noeud s'insère dans une feuille, créez un nouveau noeud intermédiaire contenant la feuille et le nouveau noeud $\rightarrow$ satisfaisant ainsi les deux premières règle
+\end{itemize}
+\item[ - \textbf{processCodes}(HuffmanNode $tree$)]: Détermine et définit les codes de toutes les feuilles de $tree$
+\end{itemize}
+Si vous êtes chaud patate, renvoyez la chaine de caractère encodé sous forme binaire plutôt que sous forme de caractère. Le but étant de compresser vous devez utilisez un octet plus stocker plusieurs caractères. N'hésitez à appeler votre chargé de TD préféré pour avoir plus d'informations (parce que la flemme d'expliquer par écrit).
+Vous pouvez utiliser le langage que vous souhaitez.
+\subsection{C++}
+Le dossier \textit{Algorithme\_TP4/TP} contient un dossier \textit{C++}. Vous trouverez dans ce dossier des fichiers \textit{exo<i>.pro} à ouvrir avec \textit{QtCreator}, chacun de ces fichiers projets sont associés à un fichier \textit{exo<i>.cpp} à compléter pour implémenter les différentes fonctions ci-dessus. \\
+L'exercice \textit{exo1.cpp} implémente une structure \textit{Heap} possédant les différentes méthodes d'un tas à implémenter. \\
+Cette structure est une spécialisation de \textit{Array}, il possède donc les mêmes fonctions d'accès que lui.
+\begin{lstlisting}[style=customc, escapechar=@]
+class Heap : public Array {
+
+	void print(); // declaration de la methode print de Heap
+
+}
+
+void Heap::print() // corps de la methode print de Heap
+{
+	for (i=0; i < this->size(); ++i)
+		printf("%d ", this->get(i));
+}
+
+void Heap::clear() // corps de la methode clear de Heap
+{
+	for (i=0; i < this->size(); ++i)
+		this->set(i, 0);
+}
+\end{lstlisting}
+\textit{HuffmanHeap} est un tas qui plutôt de stocker des entier, stocker des HuffmanNode. \\
+\textit{HuffmanNode} est un noeud, comme \textit{BinaryTree} dans le TP3, il possède un enfant gauche $left$ et droit $right$ du même type que lui, ces deux enfants peuvent donc utiliser les mêmes méthodes que \textit{HuffmanNode}. \\
+\begin{lstlisting}[style=customc, escapechar=@]
+struct HuffmanNode {
+	
+	HuffmanNode* left;
+	HuffmanNode* right;	
+	int value;
+	char character;
+	string code;
+	
+	void print()
+	{
+		if (this->left != nullptr)
+			printf("left: %d with code: %s\n", this->left->value, this->left->code);
+		if (this->right != nullptr)
+			printf("right: %d with code: %s\n", this->right->value, this->right->code);
+		printf("this: %d\n", this->value);
+	}
+
+}
+\end{lstlisting}
+\paragraph{Notes:} 
+\begin{itemize}
+\item Dans une fonction $C_{++}$, si le type d'un paramètre est accompagné d'un '\&' alors il s'agit d'un paramètre entré/sortie. La modification du paramètre se répercute en dehors de la fonction.
+\item La fonction $huffmanDict$ a pour paramètre un $HuffmanNode*\&$, il s'agit d'un pointer dont vous pouvez modifier l'adresse vers laquelle il pointe.
+\item Lorsque vous faites appel à $this$ dans une méthode d'une structure (ou d'une classe), vous pouvez accéder aux attributs de la structure en question, comme dans l'exemple ci-dessus.
+\item Vous pouvez utiliser la méthode createNode(int $value$) pour créer un nouveau nœud.
+\end{itemize}
+
+\end{document}

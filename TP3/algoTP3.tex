@@ -1,0 +1,258 @@
+\documentclass[11pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{dialogue}
+\usepackage{pdfpages}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{Alors}}
+\renewcommand{\algorithmicelse}{\textbf{Sinon}}
+\renewcommand{\algorithmicfor}{\textbf{Pour}}
+\renewcommand{\algorithmicforall}{\textbf{Pour chaque}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{Tant que}}
+\renewcommand{\algorithmicreturn}{\textbf{Retourner}}
+
+
+\def\C{\mathbb{C}}
+ \parskip 5mm
+ \parindent 5mm
+ \definecolor{Green}{RGB}{20,127,50}
+ \definecolor{Red}{RGB}{150,50,50}
+\definecolor{orange}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0.1,0.2,0.6}
+\definecolor{dark_blue}{rgb}{0.05,0.1,0.15}
+\definecolor{mauve}{rgb}{0.58,0.5,0.62}
+ \geometry{top=40mm, bottom=15mm, left=30mm , right=25mm}
+ 
+ \hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+ 
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C++,
+  showstringspaces=false,
+  tabsize=2,
+  basicstyle=\footnotesize,
+  keywordstyle=\bfseries\color{Green},
+  identifierstyle=\color{dark_blue},
+  stringstyle=\color{orange},
+  commentstyle=\footnotesize\ttfamily\color{mauve},
+}
+
+
+\newcommand{\intervalle}[2]{\mathopen{[}#1\,;#2\mathclose{]}}
+\newcommand{\reelplus}{$\mathopen{[}0\,;+\infty\mathclose{[}$}
+\newcommand{\reelmoins}{$\mathopen{]}-\infty\,;0\mathclose{]}$}
+\newcommand{\reel}{$\mathopen{]}-\infty\,;+\infty\mathclose{[}$}
+\author{\textcolor{Green}{Firegreen}}
+\title{\textcolor{Green}{\textbf{Maths}}}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+ \geometry{top=20mm, bottom=15mm, left=30mm , right=25mm}
+\begin{document}
+\begin{minipage}[t]{0.3\paperwidth}
+\begin{flushleft}
+\raisebox{-0.5\height}{\includegraphics[width=0.15\paperwidth]{imac}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\paperwidth}
+\begin{flushright}
+\noindent \Huge{Algorithmique Avancé} \\
+\noindent \LARGE{TP 3} \\
+\noindent \Large{Recherche dichotomique et Arbre binaire}
+\end{flushright}
+\end{minipage}\\
+\begin{center}
+\rule{\textwidth}{0.2cm}
+\end{center}
+Les algorithmes les plus efficaces sont souvent en $O(log(n))$ ou en $O(n log(n))$. Vous allez implémenter durant ce TP un algorithme de recherche en $O(log(n))$ et une structure de données qui facilite la recherche.
+  
+\section{Recherche dichotomique}
+\subsection{Principe}
+Cette algorithme fonctionne avec un tableau de nombre \textbf{triés}, lorsqu'on compare un nombre avec l'un de ceux du tableau, on peut déterminer dans quelle partie du tableau le nombre peut potentiellement se trouver. Si notre nombre est inférieur à celui comparé, il risque de se trouver dans la première partie du tableau, dans le cas contraire il devrait se trouver dans la seconde partie du tableau.\\
+En partant de ce principe là, on peut cibler nos recherche. En particulier, en regardant la valeur du milieu de tableau, on divise le tableau en deux et en réitérant ce processus avec, à chaque fois, la partie qui contient potentiellement le nombre, on réduit le nombre de recherches total. Le temps que nous allons mettre avant de savoir si le nombre que l'on cherche est dans le tableau ou pas revient à se demander combien de fois nous pouvons diviser le tableau en 2, ou autrement-dit, combien de fois devons-nous multiplier 2 pour obtenir la taille du tableau $\Rightarrow 2^x = n \Leftrightarrow x = log_2(n)$
+\begin{center}
+\includegraphics[width=0.8\textwidth]{binary_search}
+\end{center}
+
+\subsection{Algorithme}
+\begin{algorithm}[h!]
+\caption{Binary Search}\label{binary_search}
+\begin{algorithmic} % enter the algorithmic environment
+    \State \textit{t} $\Leftarrow $ tableau de $n$ nombre aléatoire \textbf{triés}
+    \State \textit{toSearch} $\Leftarrow $ nombre à chercher
+    \State \textit{start} $\Leftarrow $ 0
+    \State \textit{end} $\Leftarrow n$
+    \While{$\textit{start} < \textit{end}$}
+    	\State \textit{mid} $\Leftarrow \frac{\textit{start} + \textit{end}}{2}$
+		\If{$\textit{toSearch} > t[\textit{mid}]$}
+			\State \textit{start} $\Leftarrow \textit{mid} + 1$
+		\ElsIf{$\textit{toSearch} < t[\textit{mid}]$}
+			\State \textit{end} $\Leftarrow \textit{mid}$
+		\Else
+			\State \textit{foundIndex} $\Leftarrow \textit{mid}$
+			\State \textbf{Arrêt}
+		\EndIf
+	\EndWhile
+\end{algorithmic}
+\end{algorithm}
+\newpage
+\section{Arbre Binaire de Recherche (ABR)}
+Les arbres binaires de recherches sont des structures de données qui reposent sur cette même idée de diviser pour réduire la recherche de données. Un arbre est un ensemble de nœuds qui sont:
+\begin{itemize}
+\item Soit des \textbf{branches}: Des nœuds qui possèdent d'autres nœuds, leurs enfants. Dans le cas d'un arbre binaire, une branche possède au maximum deux enfants (gauche et droite).
+\item Soit des \textbf{feuilles}: Des nœuds sans enfants.
+\end{itemize}
+Une branche qui n'est l'enfant d'aucune autre branche est une \textbf{racine}.\\
+L'arbre binaire de recherche est organisée de telle sorte que chaque nœud soit plus grand que son enfant de gauche et plus petit que son enfant de droite.
+\begin{figure}[h!]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{binary_tree}
+\caption{Exemple d'arbre binaire de recherche}
+\end{center}
+\end{figure}
+Cette organisation permet de faciliter la recherche d'un élément, chaque nœud qui ne correspond pas à l'élément recherché délègue la recherche à son gauche ou droite, réduisant à chaque fois la recherche de moitié.
+\paragraph{Propriété:} La hauteur $h$ d'un arbre est égale au nombre de nœuds se trouvant dans le chemin le plus long pour arriver à une feuille.
+\subsection{Arbre AVL - Arbre de recherche Adelson-Velsky Landis}
+Le problème de l'exemple donné ci-dessus est la recherche du nombre 20. On arrive au nœud 20 après 5 itérations au lieu de 3. Ce problème est dû au fait que l'arbre n'est pas correctement équilibré.
+Un arbre $a$ est \textbf{équilibré} s'il répond à la propriété suivante:
+$$
+\forall noeud \in arbre, -1 \leq f(noeud) \leq 1
+$$
+$$
+f(n) = h(droit) - h(gauche)
+$$
+Autrement-dit, aucun des nœuds ne doit être plus profond de deux nœuds ou plus que son frère.\\
+l'arbre \textbf{AVL} ou arbre de recherche automatiquement équilibré est un arbre de recherche qui s'équilibre à chaque insertion d'une valeur. Cela permet de garantir une complexité d'insertion et de recherche en $o(log(n))$
+\subsubsection{Équilibrage/rotation d'un arbre}
+Après avoir inséré (ou supprimé) un nœud dans l'arbre si on se rend compte que celui-ce devient déséquilibré, il faut procédé à une rotation de l'arbre pour le rééquilibrer.\\
+Voici les différentes rotations possibles:
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{binary_tree_rd}
+\caption{Rotation Droite}
+\end{center}
+\end{figure}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{binary_tree_rg}
+\caption{Rotation Gauche}
+\end{center}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{binary_tree_rdg}
+\caption{Rotation Droite Gauche}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{binary_tree_rgd}
+\caption{Rotation Gauche Droite}
+\end{figure}
+\newpage
+\subsubsection{Algorithme}
+Lors d'une insertion ou d'une suppression d'un nœud, si votre arbre se déséquilibre:
+\begin{itemize}
+\item Si le nœud x le plus bas déséquilibré a un déséquilibre $-2$:
+\begin{itemize}
+\item Son fils gauche a un déséquilibre $-1$ $\Rightarrow$ Rotation droite de x
+\item Son fils gauche a un déséquilibre $+1$ $\Rightarrow$ Rotation gauche droite de x
+\end{itemize}
+\item Sinon le nœud x a un déséquilibre $+2$:
+\begin{itemize}
+\item Son fils droit a un déséquilibre $-1$ $\Rightarrow$ Rotation droite gauche de x
+\item Son fils droit a un déséquilibre $+1$ $\Rightarrow$ Rotation gauche de x
+\end{itemize}
+\end{itemize}\vspace{1cm}
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.9\textwidth]{balanced_binary_tree}
+\caption{Équilibrage d'un arbre}
+\end{figure}
+\section{TP}
+\noindent
+Implémenter les fonctions suivantes:
+\begin{itemize}
+\item[ - \textbf{binarySearch}(Array $array$, int $toSearch$)]: retourne l'index de la valeur $toSearch$ ou $-1$ si la valeur n'est pas dans le tableau.
+\item[ - \textbf{binarySearchAll}(Array $array$, int $toSearch$, int indexMin, int indexMax)]: rempli l'index minimum et maximum de la valeur $toSearch$. Si la valeur n'est pas dans le tableau rempli les deux index par $-1$.
+\end{itemize}
+Implémenter un arbre binaire de recherche avec les méthodes suivantes:
+\begin{itemize}
+\item[ - \textbf{insertNumber}(int value)]: insère un nouveau $noeud$ dans l'arbre avec la valeur $value$.
+\item[ - \textbf{height}()]: retourne la hauteur de l'arbre.
+\item[ - \textbf{nodesCount}()]: retourne le nombre de nœuds de l'arbre.
+\item[ - \textbf{isLeaf}()]: retourne vrai si l'arbre est une feuille, faux sinon.
+\item[ - \textbf{allLeaves}(Node* $leaves[ \rceil$, int $leavesCount$)]: rempli le tableau $leaves$ avec toutes les feuilles de l'arbre.
+\item[ - \textbf{inorderTravel}(Node* $nodes[ \rceil$, int $nodesCount$)]: rempli le tableau $nodes$ en parcourant l'arbre dans l'ordre infixe (fils gauche, parent, fils droit).
+\item[ - \textbf{preorderTravel}(Node* $nodes[ \rceil$, int $nodesCount$)]: rempli le tableau $nodes$ en parcourant l'arbre dans l'ordre préfixe (parent, fils gauche, fils droit).
+\item[ - \textbf{postorderTravel}(Node* $nodes[ \rceil$, int $nodesCount$)]: rempli le tableau $nodes$ en parcourant l'arbre dans l'ordre suffixe (fils gauche, fils droit, parent).
+\item[ - \textbf{search}(int value)]: renvoie le Node associé à $value$
+\item[ - \textbf{insertNumber}(int value)]: insertNumber modifié pour garder un arbre équilibré.
+\end{itemize}
+Vous pouvez utiliser le langage que vous souhaitez.
+\subsection{C++}
+Le dossier \textit{Algorithme\_TP3/TP} contient un dossier \textit{C++}. Vous trouverez dans ce dossier des fichiers \textit{exo<i>.pro} à ouvrir avec \textit{QtCreator}, chacun de ces fichiers projets sont associés à un fichier \textit{exo<i>.cpp} à compléter pour implémenter les différentes fonctions ci-dessus. \\
+L'exercice \textit{exo3.cpp} implémente une structure \textit{BinarySearchTree} possédant les différentes méthodes d'un arbre binaire de recherche à implémenter.
+\begin{lstlisting}[style=customc, escapechar=@]
+struct Node {
+	
+	Node* left;
+	Node* right;	
+	int value;
+	
+	void print()
+	{
+		if (this->left != nullptr)
+			std::cout << "left: " << this->left->value << std::endl;
+		if (this->right != nullptr)
+			std::cout << "right: " << this->right->value << std::endl;
+		std::cout << "this: " << this->value << std::endl;
+	}
+
+}
+\end{lstlisting}
+Implémenter une méthode dans une structure/une classe permet de rajouter des comportements à vos objets. Une fois implémentée, vous pouvez l'utiliser de cette façon
+\begin{lstlisting}[style=customc, escapechar=@]
+int main()
+{
+	Node a_node;
+	a_node.value = 10;
+	a_node.print(); // "this: 10"
+}
+\end{lstlisting}
+Ici \textbf{$this$} renvoie à l'objet $a_node$, il va utiliser les données de $a_node$ dans la méthode \textbf{print} et donc afficher 10.
+\paragraph{Notes:} 
+\begin{itemize}
+\item Dans une fonction $C_{++}$, si le type d'un paramètre est accompagné d'un '\&' alors il s'agit d'un paramètre entré/sortie. La modification du paramètre se répercute en dehors de la fonction. Pour la fonction $binarySearchAll$, vous pouvez modifier $indexMin$ et $indexMax$ pour retourner les index à calculer. 
+\item La structure $BinaryTree$ est un alias de la structure $Node$, il s'agit de la même structure.
+\item $BinarySearchTree$ est une spécialisation de $BinaryTree$, il possède donc les mêmes propriétés que la structure $BinaryTree$ et possède donc déjà les attributs $left$,$right$ et $value$
+\item Lorsque vous faites appel à $this$ dans une méthode d'une structure (ou d'une classe), vous pouvez accéder aux attributs de la structure en question, comme dans l'exemple ci-dessus.
+\item Vous pouvez utiliser la méthode createNode(int $value$) pour créer un nouveau nœud.
+\end{itemize}
+
+\end{document}

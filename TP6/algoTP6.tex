@@ -1,0 +1,253 @@
+\documentclass[11pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{dialogue}
+\usepackage{pdfpages}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{Alors}}
+\renewcommand{\algorithmicelse}{\textbf{Sinon}}
+\renewcommand{\algorithmicfor}{\textbf{Pour}}
+\renewcommand{\algorithmicforall}{\textbf{Pour chaque}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{Tant que}}
+\renewcommand{\algorithmicreturn}{\textbf{Retourner}}
+
+
+\def\C{\mathbb{C}}
+ \parskip 5mm
+ \parindent 5mm
+ \definecolor{Green}{RGB}{20,127,50}
+ \definecolor{Red}{RGB}{150,50,50}
+\definecolor{orange}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0.1,0.2,0.6}
+\definecolor{mauve}{rgb}{0.58,0.5,0.62}
+ \geometry{top=40mm, bottom=15mm, left=30mm , right=25mm}
+ 
+ \hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+ 
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C++,
+  showstringspaces=false,
+  tabsize=2,
+  basicstyle=\footnotesize,
+  keywordstyle=\bfseries\color{Green},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  commentstyle=\footnotesize\ttfamily\color{mauve},
+}
+
+
+\newcommand{\intervalle}[2]{\mathopen{[}#1\,;#2\mathclose{]}}
+\newcommand{\reelplus}{$\mathopen{[}0\,;+\infty\mathclose{[}$}
+\newcommand{\reelmoins}{$\mathopen{]}-\infty\,;0\mathclose{]}$}
+\newcommand{\reel}{$\mathopen{]}-\infty\,;+\infty\mathclose{[}$}
+\author{\textcolor{Green}{Firegreen}}
+\title{\textcolor{Green}{\textbf{Maths}}}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\geometry{top=20mm, bottom=15mm, left=30mm , right=25mm}
+\begin{document}
+\begin{minipage}[t]{0.3\paperwidth}
+\begin{flushleft}
+\raisebox{-0.5\height}{\includegraphics[width=0.15\paperwidth]{imac}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\paperwidth}
+\begin{flushright}
+\noindent \Huge{Algorithmique Avancé} \\
+\noindent \LARGE{TP 6} \\
+\noindent \Large{Graphes}
+\end{flushright}
+\end{minipage}\\
+\begin{center}
+\rule{\textwidth}{0.2cm}
+\end{center}
+Beaucoup de problèmes ne peuvent pas être résolu que par des arbres ou des listes. Il arrive souvent qu'un élément ne soit pas uniquement le parent d'un autre mais qu'il soit connecté à plusieurs autres éléments. Un cas basique est les relations d'amitiés dans un réseau social, une personne est connectée à d'autre et ces autres personnes sont eux-même connectés à d'autres. Mais il existe plein d'autre problème comme trouver un itinéraire ou détecter un objet sur une image.
+  
+\section{Graphe}
+Un \textbf{Graphe} est une structure de données défini par un ensemble de \textbf{sommets} $S$ et en ensemble d'\textbf{arêtes} (couple de sommets) $A$.\\
+Exemple de graphe pour $S=\{1, 4, 5, 6, 7, 9, 10\}$,\\ $A=\{(1, 4), (4, 6), (6, 7), (5, 6), (7, 4), (10, 7), (4, 10), (9, 10), (9, 4)\}$:\\
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{graph}
+\caption{Exemple de Graphe}
+\end{center}
+\end{figure}
+Il existe deux grands types de graphes, les graphes \textbf{non-orientés} et les graphes \textbf{orientés} qui possèdent respectivement des arêtes \textbf{bidirectionnelles} et \textbf{unidirectionnelles}. Une arête unidirectionnelle signifie qu'un sommet pointe vers un autre mais que ce dernier ne pointe pas forcément vers lui. Dans le cas des relations amicales on va considérer un graphe non-orienté, l'ami d'une personne a pour ami cette même personne (la relation va dans les deux sens). Dans un réseau d'écoulement d'eau, une jointure mène l'eau vers une autre mais cette dernière ne peut faire couler l'eau dans le sens inverse.
+\subsection{Graphe pondéré}
+En gardant l'exemple d'un réseau d'écoulement d'eau, on peut ajouter des informations en plus sur les arêtes pour par exemple représenter la capacités des tuyaux. Ce genre de graphes qui stockent des valeurs pour chaque arrête sont des graphes pondérés.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{valued_graph}
+\caption{Exemple de Graphe pondéré}
+\end{center}
+\end{figure}
+\newpage
+\subsection{Chemin et Circuit}
+Un \textbf{chemin} est un ensemble d'arête consécutif permettant d'atteindre un sommet en partant d'un autre. Par exemple, dans le graphe précédent, le chemin $(9, 4), (4, 6), (6, 7)$ permet d'atteindre 7 en partant de 9.\\
+Un \textbf{circuit} est un chemin permettant d'atteindre un sommet en partant de ce même sommet. Par exemple, dans le graphe précédent, le circuit $(4, 6), (6, 7), (7, 4)$ permet d'atteindre 4 en partant de 4.\\
+\subsection{Graphe Connexe et fortement connexe}
+Un graphe connexe est un graphe dont chaque sommet peut trouver un chemin vers n'importe quel autre sommet du graphe. Le graphe est fortement connexe s'il s'agit d'un graphe orienté. Par exemple le sous-graphe $S=\{4, 6, 7, 10\}$ du graphe est fortement connexe, il existe au moins un chemin entre chaque sommet.
+\newpage
+\section{Algorithme}
+\subsection{Représentation}
+Un graphe peut être représenté de deux manières différentes.
+\subsubsection{Matrice d'adjacence}
+Une matrice d'adjacence est une matrice carrée dont la taille est égale au nombre de sommets dans le graphe. Le nombre de la ligne $i$ et de la colonne $j$ représente la relation entre le sommet $i$ et le sommet $j$, s'il est égale à 1, il existe une arête entre ces deux éléments (de $i$ vers $j$). \\
+Exemple pour le graphe précédent. \\
+
+\[
+S = 
+\left[
+\begin{array}{ccccccc}
+1 & 4 & 5 & 6 & 7 & 9 & 10 
+\end{array}\\
+\right]
+\]
+\[
+\left[
+\begin{array}{c|ccccccc}
+ & 1 & 4 & 5 & 6 & 7 & 9 & 10 \\
+ \hline
+ 1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 \\
+ 4 & \textbf{1} & 0 & 0 & \textbf{1} & 0 & 0 & 0 \\
+ 5 & 0 & 0 & 0 & \textbf{1} & 0 & 0 & 0 \\
+ 6 & 0 & 0 & 0 & 0 & \textbf{1} & 0 & 0 \\
+ 7 & 0 & \textbf{1} & 0 & 0 & 0 & 0 & 0 \\
+ 9 & 0 & \textbf{1} & 0 & 0 & 0 & 0 & \textbf{1} \\
+ 10 & 0 & 0 & 0 & 0 & \textbf{1} & 0 & 0 \\
+\end{array}
+\right]
+\]
+\paragraph{\textbf{Note:}} Un graphe non-orienté aura pour matrice d'adjacence une matrice symétrique.
+\paragraph{\textbf{Note:}} Un graphe pondéré peut être représenté par une matrice d'adjacence dont chaque valeur représente la valeur de l'arête entre $i$ et $j$.
+\subsubsection{Liste d'adjacence}
+On peut aussi représenter un graphe stockant les arrêtes dans une liste chainée pour chaque sommet.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{list_graph}
+\caption{Représentation d'un graphe par listes}
+\end{center}
+\end{figure}
+\newpage
+\subsection{Parcours en profondeur}
+Le parcours d'un graphe peut poser un problème lorsqu'on arrive dans un circuit. En suivant un circuit, on risque d'emprunter toujours les mêmes arrêtes. Pour éviter ce problème, il faut définir un tableau listant l'ensemble des sommets parcourus. \\
+Le parcours en profondeur se base sur un appel récursif du parcours sur les différents sommets qu'on rencontre.
+\begin{center}
+\begin{lstlisting}[style=customc, escapechar=@]
+	void deep_travel(Vertex v, bool visited[])
+	{
+		print(v);
+		visited[v.index]=true; 
+		for (Edge e=v.first_edge; e != NULL; e=e.next)
+		{
+			if (!visited[e.second_vertex.index])
+				deep_travel(e.second_vertex, visited);
+		}
+	}
+\end{lstlisting}
+\end{center}
+\subsection{Parcours en largeur}
+Le parcours en largeur est semblable au parcours en profondeur, mais évite la récursion en utilisant une File.
+\begin{center}
+\begin{lstlisting}[style=customc, escapechar=@]
+	void wide_travel(Vertex vertices[])
+	{
+		Queue q;
+		bool visited[vertices.size()];
+		\\ init all visited to false
+		q.push(vertices[0]);
+		while(!q.empty())
+		{
+			Vertex v = q.pop();
+			print(v);
+			visited[v.index] = true;
+			for (Edge e=v.first_edge; e != NULL; e=e.next)
+			{
+				if (!visited[e.second_vertex.index])
+					q.push(e.second_vertex);
+			}
+		}
+	}
+\end{lstlisting}
+\end{center}
+\section{TP}
+\noindent
+Implémenter les fonctions d'un graphe en utilisant la représentation par listes.
+\begin{itemize}
+\item[ - \textbf{buildFromAdjenciesMatrix}(int** $adjencies$, int $nodeCount$)]: Construit un graphe à partir d'une matrice d'adjacence. La valeur d'un sommet représente son indice dans le tableau. $adjencies$ est tableau 2D de taille $nodeCount$.
+\item[ - \textbf{deepTravel}(GraphNode* $first$, GraphNode* $nodes$[ $\rceil$, int\& $nodesSize$, bool $visited$[ $\rceil$)]: rempli le tableau $nodes$ en parcourant le graphe en profondeur à partir de $first$. $nodeSize$ est le nombre de noeud dans $nodes$ et est donc égale à 0 lors du premier appel de fonction. $visited$ est un tableau de booléen rempli de $false$ lors du premier appel. 
+\item[ - \textbf{wideTravel}(GraphNode* $first$, GraphNode* $nodes$[ $\rceil$, int\& $nodesSize$, bool $visited$[ $\rceil$)]: rempli le tableau $nodes$ en parcourant le graphe en largeur à partir de $first$. $nodeSize$ est le nombre de noeud dans $nodes$ et est donc égale à 0 lors du premier appel de fonction. $visited$ est un tableau de booléen rempli de $false$ lors du premier appel. 
+\item[ - \textbf{detectCycle}(GraphNode* $first$, bool $visited$[ $\rceil$)]: Retourne Vrai si le graphe possède un circuit commençant par $first$.
+\end{itemize}
+\subsection{C++}
+Le dossier \textit{Algorithme\_TP6/TP} contient un dossier \textit{C++}. Vous trouverez dans ce dossier des fichiers \textit{exo<i>.pro} à ouvrir avec \textit{QtCreator}, chacun de ces fichiers projets sont associés à un fichier \textit{exo<i>.cpp} à compléter pour implémenter les différentes fonctions ci-dessus. \\
+L'exercice \textit{exo1.cpp} implémente une structure \textit{Graph} définissant un tableau de \textit{GraphNode} (de sommets). Chaque \textit{GraphNode} possède une liste chainée de \textit{Edge} reliant un \textit{GraphNode} source et un \textit{GraphNode} destination. Ces trois classes permettent de décrire un graphe.
+\begin{lstlisting}[style=customc, escapechar=@]
+struct Edge
+{
+	Edge(GraphNode* source, GraphNode* destination, int distance=0);
+
+	GraphNode* source;
+	GraphNode* destination;
+
+	int distance;
+
+	Edge* next; // allow chaining
+};
+
+struct GraphNode
+{
+	GraphNode(int value);
+
+	void appendNewEdge(GraphNode* destination, int distance=0); // add a new edge to destination
+
+	int value;
+	Edge* edges;
+};
+
+class Graph
+{
+public:
+	Graph(int size=20); // size = allocated array size
+
+	int nodesCount(); // real number of nodes
+	void appendNewNode(GraphNode* node); // add a new node in the nodes array
+
+	GraphNode& operator[](int index); // get the GraphNode& from the given index
+};
+\end{lstlisting}
+\paragraph{Notes:} 
+\begin{itemize}
+\item Dans une fonction $C_{++}$, si le type d'un paramètre est accompagné d'un '\&' alors il s'agit d'un paramètre entré/sortie. La modification du paramètre se répercute en dehors de la fonction.
+\item Lorsque vous faites appel à $this$ dans une méthode d'une structure (ou d'une classe), vous pouvez accéder aux attributs de la structure en question, comme dans l'exemple ci-dessus.
+\end{itemize}
+
+\end{document}

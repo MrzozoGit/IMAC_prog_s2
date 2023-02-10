@@ -1,0 +1,227 @@
+\documentclass[11pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage[table]{xcolor}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{dialogue}
+\usepackage{pdfpages}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{ulem}
+
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{Alors}}
+\renewcommand{\algorithmicelse}{\textbf{Sinon}}
+\renewcommand{\algorithmicfor}{\textbf{Pour}}
+\renewcommand{\algorithmicforall}{\textbf{Pour chaque}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{Tant que}}
+\renewcommand{\algorithmicreturn}{\textbf{Retourner}}
+
+
+\def\C{\mathbb{C}}
+ \parskip 5mm
+ \parindent 5mm
+ \definecolor{Green}{RGB}{20,127,50}
+ \definecolor{Red}{RGB}{150,50,50}
+\definecolor{orange}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0.2,0.3,0.75}
+\definecolor{mauve}{rgb}{0.58,0.5,0.62}
+\definecolor{light_green}{rgb}{0.6,0.9,0.72}
+\definecolor{light_green2}{rgb}{0.85,1.0,0.9}
+\definecolor{light_gray}{rgb}{0.75,0.8,0.75}
+\definecolor{yellow}{rgb}{1.0,0.95,0.2}
+
+ \geometry{top=40mm, bottom=15mm, left=30mm , right=25mm}
+ 
+ \hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+ 
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C++,
+  showstringspaces=false,
+  tabsize=2,
+  basicstyle=\footnotesize,
+  keywordstyle=\bfseries\color{Green},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  commentstyle=\footnotesize\ttfamily\color{mauve},
+}
+
+
+\newcommand{\intervalle}[2]{\mathopen{[}#1\,;#2\mathclose{]}}
+\newcommand{\reelplus}{$\mathopen{[}0\,;+\infty\mathclose{[}$}
+\newcommand{\reelmoins}{$\mathopen{]}-\infty\,;0\mathclose{]}$}
+\newcommand{\reel}{$\mathopen{]}-\infty\,;+\infty\mathclose{[}$}
+\author{\textcolor{Green}{Firegreen}}
+\title{\textcolor{Green}{\textbf{Maths}}}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\geometry{top=20mm, bottom=15mm, left=30mm , right=25mm}
+\begin{document}
+\begin{minipage}[t]{0.3\paperwidth}
+\begin{flushleft}
+\raisebox{-0.5\height}{\includegraphics[width=0.15\paperwidth]{imac}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\paperwidth}
+\begin{flushright}
+\noindent \Huge{Programmation \& Algorithmique} \\
+\noindent \LARGE{TP 7} \\
+\noindent \Large{Le plus court chemin}
+\end{flushright}
+\end{minipage}\\
+\begin{center}
+\rule{\textwidth}{0.2cm}
+\end{center}
+On représente souvent une carte par un graphe, chaque sommet étant un lieu et chaque arête étant une route entre deux lieux. On peut pondérer le graphe pour représenter le temps mis pour aller d'un lieu à un autre.
+
+\section{Algorithme de Bellman–Ford}
+Prenons l'exemple suivant avec monsieur Ford (le constructeur automobile) dans sa belle voiture qui souhaite se rendre à sa boutique B. Il se retrouve devant un carrefour C et se demande s'il n'y a pas un moyen de se rendre à son usine que le chemin direct. Il décide de dérouler l'algorithme de Bellman-Ford (Les mathématiciens) et ce malgré les conducteurs chevronnés qui attendent derrière lui. Cet algorithme consiste à vérifier les chemins entre C et chaque lieu à proximité qu'il connait.\\
+Il connait notamment l'école E de ses enfants, l'appartement A d'un ami et une décharge D.\\
+Posons le graphe suivant:\\
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.6\textwidth]{shortest_path}
+\caption{Graphe des lieux à proximités}
+\end{center}
+\end{figure}
+\newpage
+\subsection{Algorithme}
+L'algorithme consiste à déterminer, pour chaque sommet s, le prédécesseur qui permet d'accéder le plus rapidement à s.\\
+Pour cela on va étudier chaque arrête du graphe (si la structure permet de recenser l'ensemble des arrêtes) et mettre à jour les distances et les prédécesseurs de chaque chaque noeud.
+\begin{algorithm}
+\caption{Belmann-Ford}\label{belmann-ford}
+\begin{algorithmic}
+    \State \textit{s0} $\Leftarrow$ sommet de depart
+    \State \textit{n} $\Leftarrow$ nombre de sommets
+    \State \textit{edges} $\Leftarrow$ liste des arrêtes à étudier
+    \State \textit{distances} $\Leftarrow$ tableau des distances minimums en partant de \textit{s0}
+    \State \textit{previous} $\Leftarrow$ tableaux des prédécesseurs de chaque sommet
+    \\
+	\State \textit{distances} $\Leftarrow$ initialisation à $\infty$
+	\State \textit{previous} $\Leftarrow$ initialisation à $\emptyset$
+	\State \textit{distances}[s0] $\Leftarrow$ 0
+	
+    \While{\textit{previous} est modifié \textbf{ET} $i \le n-1$}
+    	\ForAll{Edge \textit{e} dans edges}
+    		\State \textit{node\_distance} $\Leftarrow$ \textit{distances}[\textit{e}.source] + \textit{e}.distance
+    		\If{node\_distance < \textit{distances}[\textit{e}.distination]}
+    			\State \textit{distances}[\textit{e}.destination] $\Leftarrow$ \textit{node\_distance}
+    			\State \textit{previous}[\textit{e}.destination] $\Leftarrow$ \textit{\textit{e}.source}
+    		\EndIf
+    	\EndFor
+    	\State \textit{i} $\Leftarrow$ \textit{i} + 1
+    \EndWhile
+\end{algorithmic}
+\end{algorithm}
+\subsection{Déroulement}
+Déroulement de l'algorithme en partant du carrefour C.\\
+(1: A$\rightarrow$E, 2: C$\rightarrow$A, 3: A$\rightarrow$D, 4: C$\rightarrow$B, 5: D$\rightarrow$E, 6: D$\rightarrow$B, 7: E$\rightarrow$B)
+\begin{center}
+\begin{tabular*}{0.95\textwidth}{|l|c|c|c|c|c||c|c|c|c|c|}
+ \rowcolor{light_green} edge & d(A) & d(B) & d(C) & d(D) & d(E) & P(A)& P(B)& P(C)& P(D)& P(E) \\
+  \rowcolor{light_green2} 0 & $\infty$ & $\infty$ & 0 & $\infty$ & $\infty$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\
+   \rowcolor{light_green2} 1 & $\infty$ & $\infty$ & 0 & $\infty$ & \cellcolor{blue} $\infty$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\
+   \rowcolor{light_green2} 2 & \cellcolor{blue} 4 & $\infty$ & 0 & $\infty$ & $\infty$ & \cellcolor{blue} C & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\
+   \rowcolor{light_green2}  3 & 4 & $\infty$ & 0 & \cellcolor{blue} 1 & $\infty$ & C & $\emptyset$ & $\emptyset$ & \cellcolor{blue} C & $\emptyset$ \\
+   \rowcolor{light_green2}  4 & 4 & \cellcolor{blue} 10 & 0 & 1 & $\infty$ & C & \cellcolor{blue} C & $\emptyset$ & C & $\emptyset$ \\
+   \rowcolor{light_green2}  5 & 4 & 10 & 0 & 1 & \cellcolor{blue} 7 & C & C & $\emptyset$ & C & \cellcolor{blue} D \\
+   \rowcolor{light_green2}  6 & 4 & \cellcolor{blue} 9 & 0 & 1 & 7 & C & \cellcolor{blue} D & $\emptyset$ & C & D \\
+   \rowcolor{light_green2}  7 & 4 & \cellcolor{blue} 8 & 0 & 1 & 7 & C & \cellcolor{blue} E & $\emptyset$ & C & D \\
+ \end{tabular*}
+\end{center}
+On obtient une première version du tableau, mais ce tableau ne recense pas les distances les plus courtes, pour être sûr d'avoir le chemin le plus court, il faut réitérer ce processus un certains nombres de fois, au maximum le nombre de sommets - 1.\\
+\begin{center}
+\begin{tabular*}{0.95\textwidth}{|l|c|c|c|c|c||c|c|c|c|c|}
+ \rowcolor{light_green} iter. & d(A) & d(B) & d(C) & d(D) & d(E) & P(A)& P(B)& P(C)& P(D)& P(E) \\
+  \rowcolor{light_green2} 0 & $\infty$ & $\infty$ & 0 & $\infty$ & $\infty$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\
+   \rowcolor{light_green2} 1 & 4 & 8 & 0 & 1 & 7 & C & E & $\emptyset$ & C & D \\
+   \rowcolor{light_green2} 2 & 4 & \cellcolor{blue} 7 & 0 & 1 & \cellcolor{blue} 6 & C & \cellcolor{blue} E & $\emptyset$ & C & \cellcolor{blue} A \\
+   \rowcolor{light_green2} 3 & 4 & 7 & 0 & 1 & 6 & C & E & $\emptyset$ & C & A \\
+   \rowcolor{light_gray} \sout{4} & 4 & 7 & 0 & 1 & 6 & C & E & $\emptyset$ & C & A \\
+ \end{tabular*}
+\end{center}
+
+On obtient ainsi un tableau de successeurs permettant de trouver rapidement les chemins les plus courts vers chaque sommet, notamment celui qui nous intéresse la boutique B. 
+\[P(B) = E \Rightarrow P(E) = A \Rightarrow P(A) = C\]
+\[ Path = \{C, A, E, B\} \]
+Dommage pour ce cher Ford, il se retrouvera non pas à sa boutique mais à l'hôpital suite aux baffes qu'il a reçu des conducteurs qui attendaient derrière lui.
+\paragraph{\textbf{Note:}} On peut faire abstraction de la dernière itération vu que l'itération précédente n'a pas subis de modification
+\section{Algorithme de Dijkstra}
+L'algorithme de Dijkstra est très semblable à celui de Bellman-Ford mais cet algorithme évite les redondances que peuvent causer les circuits d'un graphe en se focalisant à chaque fois sur le sommet accessible le plus rapidement. On marque chaque sommet visité pour éviter d'y retourner plus tard.
+\subsection{Algorithme}
+\begin{algorithm}
+\caption{Dijkstra}\label{dijkstra}
+\begin{algorithmic}
+    \State \textit{M} $\Leftarrow$ sommets marqués
+    \State \textit{S} $\Leftarrow$ listes des sommets
+    \State \textit{s0} $\Leftarrow$ sommet de depart
+    \State \textit{distances} $\Leftarrow$ tableau des distances minimums en partant de \textit{s0}
+    \State \textit{previous} $\Leftarrow$ tableaux des prédécesseurs de chaque sommet
+    \\
+	\State \textit{distances} $\Leftarrow$ initialisation à $\infty$
+	\State \textit{previous} $\Leftarrow$ initialisation à $\emptyset$
+	\State \textit{distances}[s0] $\Leftarrow$ 0
+	\State \textit{s} $\Leftarrow$ s0
+    \While{\textit{s} n'est pas nul}
+    	\State \textit{M}.push(s)
+    	\ForAll{Edge \textit{e} dans s.edges}
+    		\If{\textit{distances}[\textit{s}] + \textit{e}.distance < \textit{distances}[\textit{e}.distination]}
+    			\State \textit{distances}[\textit{e}.distination] $\Leftarrow$ \textit{distances}[\textit{s}] + \textit{e}.distance
+    			\State \textit{previous}[\textit{e}.distination] $\Leftarrow$ \textit{s}
+    		\EndIf
+    	\EndFor
+    	\State s $\Leftarrow$ sommet ayant la distance la plus petite parmi les sommets qui ne sont pas dans \textit{M}
+    \EndWhile
+\end{algorithmic}
+\end{algorithm}
+\paragraph{\textbf{Note:}} On peut utiliser un tableau \textit{visited} pour savoir si un sommet est déjà dans \textit{M} ou pas.
+\newpage
+\subsubsection{Déroulement}
+Déroulement de l'algorithme en partant du carrefour C.\\
+\begin{center}
+\begin{tabular*}{0.95\textwidth}{|l|c|c|c|c|c||c|c|c|c|c|}
+ \rowcolor{light_green} Chemin & d(A) & d(B) & d(C) & d(D) & d(E) & P(A)& P(B)& P(C)& P(D)& P(E) \\
+  \rowcolor{light_green2} 0 M=$\emptyset$ & $\infty$ & $\infty$ & 0 & $\infty$ & $\infty$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ & $\emptyset$ \\
+   \rowcolor{light_green2} 1 M=\{C\} & 4 & 10 &  & \cellcolor{yellow} 1 & $\infty$ & C & C & $\emptyset$ & C & $\emptyset$ \\
+\rowcolor{light_green2} 2 M=\{C, D\} & \cellcolor{yellow} 4 & 9 &  &  & 7 & C & D & $\emptyset$ & C & D \\
+\rowcolor{light_green2} 3 M=\{C, D, A\} & & 9 & & & \cellcolor{yellow} 6 & C & D & $\emptyset$ & C & A \\
+ \rowcolor{light_green2} 4 M=\{C, D, A, E\} &  & \cellcolor{yellow} 7 &  &  &  & C & E & $\emptyset$ & C & A \\
+ \rowcolor{light_green2} 5 M=\{C, D, A, E, B\} &  &  &  &  &  & C & E & $\emptyset$ & C & A \\
+ \end{tabular*}
+\end{center}
+\section{TP}
+\noindent
+Soit le graphe G suivant.\\
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=0.75\textwidth]{complex_graph}
+\caption{Graphe G}
+\end{center}
+\end{figure}
+Dérouler l'algorithme de Dijkstra une première fois en partant de A et une deuxième fois en partant de F. \\
+\textbf{Optionnel:} Dérouler  de Bellman-Ford une première fois en partant de A et une deuxième fois en partant de F.
+\end{document}

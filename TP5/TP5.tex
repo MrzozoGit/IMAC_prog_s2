@@ -1,0 +1,169 @@
+\documentclass[11pt]{extarticle}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[french]{babel}
+\usepackage{amsmath,amssymb}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{lmodern}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{dialogue}
+\usepackage{pdfpages}
+\usepackage{algpseudocode}
+\usepackage{algorithm}
+\usepackage{algorithmicx}
+\usepackage{listings}
+\usepackage{hyperref}
+
+\renewcommand{\algorithmicend}{\textbf{fin}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{Alors}}
+\renewcommand{\algorithmicelse}{\textbf{Sinon}}
+\renewcommand{\algorithmicfor}{\textbf{Pour}}
+\renewcommand{\algorithmicforall}{\textbf{Pour chaque}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicwhile}{\textbf{Tant que}}
+\renewcommand{\algorithmicreturn}{\textbf{Retourner}}
+
+
+\def\C{\mathbb{C}}
+ \parskip 5mm
+ \parindent 5mm
+ \definecolor{Green}{RGB}{20,127,50}
+ \definecolor{Red}{RGB}{150,50,50}
+\definecolor{orange}{rgb}{0,0.6,0}
+\definecolor{blue}{rgb}{0.1,0.2,0.6}
+\definecolor{mauve}{rgb}{0.58,0.5,0.62}
+ \geometry{top=40mm, bottom=15mm, left=30mm , right=25mm}
+ 
+ \hypersetup{
+    colorlinks=true,       % false: boxed links; true: colored links
+    linkcolor=blue,          % color of internal links (change box color with linkbordercolor)
+    citecolor=green,        % color of links to bibliography
+    filecolor=magenta,      % color of file links
+    urlcolor=cyan           % color of external links
+}
+ 
+\lstdefinestyle{customc}{
+  belowcaptionskip=1\baselineskip,
+  breaklines=true,
+  frame=L,
+  xleftmargin=\parindent,
+  language=C++,
+  showstringspaces=false,
+  tabsize=2,
+  basicstyle=\footnotesize,
+  keywordstyle=\bfseries\color{Green},
+  identifierstyle=\color{blue},
+  stringstyle=\color{orange},
+  commentstyle=\footnotesize\ttfamily\color{mauve},
+}
+
+
+\newcommand{\intervalle}[2]{\mathopen{[}#1\,;#2\mathclose{]}}
+\newcommand{\reelplus}{$\mathopen{[}0\,;+\infty\mathclose{[}$}
+\newcommand{\reelmoins}{$\mathopen{]}-\infty\,;0\mathclose{]}$}
+\newcommand{\reel}{$\mathopen{]}-\infty\,;+\infty\mathclose{[}$}
+\author{\textcolor{Green}{Firegreen}}
+\title{\textcolor{Green}{\textbf{Maths}}}
+
+\renewcommand{\familydefault}{\sfdefault}
+
+\geometry{top=20mm, bottom=15mm, left=30mm , right=25mm}
+\begin{document}
+\begin{minipage}[t]{0.3\paperwidth}
+\begin{flushleft}
+\raisebox{-0.5\height}{\includegraphics[width=0.15\paperwidth]{imac}}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}[t]{0.4\paperwidth}
+\begin{flushright}
+\noindent \Huge{Algorithmique Avancé} \\
+\noindent \LARGE{TP 5} \\
+\noindent \Large{Hachage et Tableau associatif}
+\end{flushright}
+\end{minipage}\\
+\begin{center}
+\rule{\textwidth}{0.2cm}
+\end{center}
+Les structures de données et les tris vu précédemment permettent de retrouver facilement des données spécifiques. Cependant jusqu'ici vous n'avez cherché que des nombres à l'aide d'autres nombres, ce qui a finalement peu d'intérêt. Il existe des structures de données qui permettent de stocker des éléments en leurs associant des "\textbf{clés}" facilement retrouvable, par exemple des nombres dont on connait déjà des méthodes de recherche.
+  
+\section{Hachage}
+Le \textbf{hachage} est une technique qui permet de calculer un entier à partir d'un élément qui n'en est pas un, par exemple une chaîne de caractères. Le but étant de manipuler plus facilement ces éléments, notamment de les comparer plus facilement.\\
+On peut notamment calculer un indice à partir d'un élément pour le stocker dans un tableau, ceci permettant de le retrouver facilement plus tard.\\
+\begin{lstlisting}[style=customc, escapechar=@]
+#define ARRAY_SIZE 40
+int hash(char* string)
+{
+	int i = 0;
+	int hash_value = 0;
+	while(string[i] != '\0')
+	{
+		hash_value += (int)string[i];
+		i++;
+	}
+	return hash_value % ARRAY_SIZE;
+}
+
+int main()
+{
+	char* hash_table[ARRAY_SIZE];
+	char* my_element = "Yolo\0";
+	hash_table[hash(my_element)] = my_element;
+	printf("Content of hash_table at %d is %s\n", hash(my_element), my_element);
+	// Content of hash_table at 19 is Yolo
+}
+\end{lstlisting}
+En ayant un hachage en $O(1)$, on obtient une insertion et une recherche instantané. Les tableaux basés sur le hachage sont des \textbf{tables de hachages}, chaque indice correspond à un code (une \textbf{valeur de hachage}). Dans l'exemple ci-dessus, on obtient facilement des \textbf{conflits}, des chaines de caractères qui ont la même valeur de hachage, qui doivent être stockés dans la même case du tableau. On se retrouve devant deux solutions selon la stratégie de stockage, soit on écrase la valeur courante, soit on stocke tous les éléments au même endroit dans une liste.
+\section{Tableau associatif}
+Aussi appelé \textbf{Map}, il s'agit d'une structure qui pour une clé donnée retrouve un élément. La clé doit être un élément dont on peut calculer une valeur de hachage unique. En stockant un élément avec sa clé, on peut le retrouver en utilisant une recherche rapide ou un arbre binaire de recherche.
+\begin{figure}[h]
+\begin{center}
+\includegraphics[width=0.8\textwidth]{map}
+\caption{Exemple de tableau associatif basé sur un arbre binaire de recherche}
+\end{center}
+\end{figure}\\
+Les tableaux associatifs permettent de stocker et récupérer des éléments en $O(log(n))$. On peut les stocker avec des nombres entier, à virgules, des chaines de caractères ou tous types qui peuvent être comparés rapidement.
+\section{TP}
+\noindent
+Implémenter les fonctions d'une table de hachage stockant des chaines de caractères. La valeur de hachage d'une chaine est le code ascii de son premier caractère, si cette valeur dépasse la taille du tableau, prenez le reste de la division de cette valeur par la taille du tableau.
+\begin{itemize}
+\item[ - \textbf{hash}(string $word$)]: Retourne la valeur de hachage de $word$.
+\item[ - \textbf{insert}(string $word$)]: Insère l'élément $word$ dans la table à l'indice correspondant à sa valeur de hachage. S'il y a déjà un élément, écraser cet élément.
+\item[ - \textbf{contains}(string $word$)]: Retourne Vrai si l'élément $word$ se trouve dans la table, Faux autrement.
+\end{itemize}
+Réimplémenter ces fonctions mais en stockant des listes chainés pour stocker plusieurs chaines de caractères avec la même valeur de hash. \vspace{0.5cm}\\
+Implémenter les fonctions suivantes pour implémenter un tableau associatif stockant des entiers indexés par des chaines de caractères. Utilisez le \href{https://en.wikipedia.org/wiki/Rolling_hash}{hachage polynomial} pour obtenir des clés uniques à partir de chaine de caractères. Considérons qu'on utilise que les 128 premiers caractères de l'encodage ascii.
+\begin{itemize}
+\item[ - \textbf{hash}(string $key$)]: Retourne la valeur de hachage de $key$.
+\item[ - \textbf{insert}(string $key$, int $value$)]: Insère $value$ en utilisant pour clé $value$.
+\item[ - \textbf{get}(string $key$)]: Retourne la valeur correspondant à $key$. Retourne 0 si aucune valeur de correspond à $key$.
+\end{itemize}
+Vous pouvez l'implémenter avec un arbre binaire ou un tableau dynamique.\\
+Vous pouvez utiliser le langage que vous souhaitez.
+\subsection{C++}
+Le dossier \textit{Algorithme\_TP5/TP} contient un dossier \textit{C++}. Vous trouverez dans ce dossier des fichiers \textit{exo<i>.pro} à ouvrir avec \textit{QtCreator}, chacun de ces fichiers projets sont associés à un fichier \textit{exo<i>.cpp} à compléter pour implémenter les différentes fonctions ci-dessus. \\
+L'exercice \textit{exo1.cpp} implémente une structure \textit{HashTable} possédant les différentes méthodes d'une table de hachage à implémenter. Cette structure est semblable à \textit{Array}, il possède les mêmes fonctions d'accès que lui mais manipule des $string$s plutôt que des $int$.
+\begin{lstlisting}[style=customc, escapechar=@]
+class HashTable {
+
+	void print(); // declaration de la methode print de HashTable
+
+}
+
+void HashTable::print() // corps de la methode print de HashTable
+{
+	for (i=0; i < this->size(); ++i)
+		printf("%d ", this->get(i));
+}
+\end{lstlisting}
+\paragraph{Notes:} 
+\begin{itemize}
+\item Dans une fonction $C_{++}$, si le type d'un paramètre est accompagné d'un '\&' alors il s'agit d'un paramètre entré/sortie. La modification du paramètre se répercute en dehors de la fonction.
+\item Lorsque vous faites appel à $this$ dans une méthode d'une structure (ou d'une classe), vous pouvez accéder aux attributs de la structure en question, comme dans l'exemple ci-dessus.
+\end{itemize}
+
+\end{document}
