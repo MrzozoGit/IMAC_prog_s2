@@ -101,22 +101,17 @@ void stocke(Liste* liste, int n, int valeur) {
 }
 
 void ajoute(DynaTableau* tableau, int valeur) {
-    if(tableau->nbVal+1 > tableau->capacite) {
-        tableau->capacite++;
+    if(tableau->nbVal == tableau->capacite) {
+        tableau->capacite = tableau->capacite*2;
         int* newData = new int[tableau->capacite];
-
-        for(int i=0; i<tableau->capacite; i++) {
+        for(int i = 0; i<tableau->nbVal; i++) {
             newData[i] = tableau->data[i];
         }
-
-        newData[tableau->capacite] = valeur;
+        delete[] tableau->data;
         tableau->data = newData;
-
-        tableau->nbVal++;
-    } else {
-        tableau->data[tableau->nbVal] = valeur;
-        tableau->nbVal++;
     }
+    tableau->data[tableau->nbVal] = valeur;
+    tableau->nbVal = tableau->nbVal + 1;
 }
 
 

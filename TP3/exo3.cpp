@@ -8,26 +8,61 @@
 MainWindow* w = nullptr;
 using std::size_t;
 
-struct SearchTreeNode : public Node
-{    
+struct SearchTreeNode : public Node {
     SearchTreeNode* left;
     SearchTreeNode* right;
     int value;
 
-    void initNode(int value)
-    {
+    void initNode(int value) {
         // init initial node without children
+        this->value = value;
+        this->left = nullptr;
+        this->right = nullptr;
     }
 
 	void insertNumber(int value) {
         // create a new node and insert it in right or left child
+        SearchTreeNode* newNode = new SearchTreeNode(value);
+        if(value <= this->value) {
+            if(this->left == nullptr)
+                this->left = newNode;
+            else
+                this->left->insertNumber(value);
+        } else {
+            if(this->right == nullptr)
+                this->right = newNode;
+            else
+                this->right->insertNumber(value);
+        }
     }
 
 	uint height() const	{
         // should return the maximum height between left child and
         // right child +1 for itself. If there is no child, return
         // just 1
-        return 1;
+
+        if(this->isLeaf()) {
+            return 1;
+        }
+
+        SearchTreeNode* leftNode = this->left;
+        int leftHeight = 1;
+        SearchTreeNode* rightNode = this->right;
+        int rightHeight = 1;
+
+        while(!leftNode->isLeaf()) {
+            leftHeight++;
+            leftNode = leftNode->left;
+            printf("leftheight: %i", leftHeight);
+        }
+
+        while(!rightNode->isLeaf()) {
+            rightHeight++;
+            rightNode = rightNode->right;
+            printf("rightHeight: %i", rightHeight);
+        }
+
+        return (leftHeight>rightHeight) ? leftHeight : rightHeight;
     }
 
 	uint nodesCount() const {
@@ -39,6 +74,8 @@ struct SearchTreeNode : public Node
 
 	bool isLeaf() const {
         // return True if the node is a leaf (it has no children)
+        if(this->left==nullptr && this->right==nullptr)
+            return true;
         return false;
 	}
 
@@ -63,8 +100,7 @@ struct SearchTreeNode : public Node
 		return nullptr;
 	}
 
-    void reset()
-    {
+    void reset() {
         if (left != NULL)
             delete left;
         if (right != NULL)
@@ -83,8 +119,7 @@ Node* createNode(int value) {
     return new SearchTreeNode(value);
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
 	MainWindow::instruction_duration = 200;
     w = new BinarySearchTreeWindow<SearchTreeNode>();
