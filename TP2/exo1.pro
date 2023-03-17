@@ -12,17 +12,18 @@ TARGET = Algorithm_TD1_exo1
 TEMPLATE = app
 CONFIG += c++11
 
+QMAKE_CXXFLAGS += -std=c++11
 SOURCES += \
         exo1.cpp \
-		../lib/mainwindow.cpp \
-		../lib/thread.cpp \
-		../lib/array.cpp \
-		../lib/tp2.cpp \
+                ../lib/mainwindow.cpp \
+                ../lib/thread.cpp \
+                ../lib/array.cpp \
+                ../lib/tp2.cpp \
 
 HEADERS += \
-		../lib/mainwindow.h \
-		../lib/thread.h \
-		../lib/array.h \
-		../lib/tp2.h \
+                ../lib/mainwindow.h \
+                ../lib/thread.h \
+                ../lib/array.h \
+                ../lib/tp2.h \
 
 INCLUDEPATH += ../lib

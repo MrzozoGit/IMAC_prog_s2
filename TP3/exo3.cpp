@@ -23,18 +23,17 @@ struct SearchTreeNode : public Node {
 	void insertNumber(int value) {
         // create a new node and insert it in right or left child
         SearchTreeNode* newNode = new SearchTreeNode(value);
-        SearchTreeNode* leftNode = this->left,* rightNode = this->right;
 
         if(value <= this->value) {
-            if(leftNode == nullptr)
-                leftNode = newNode;
+            if(this->left == nullptr)
+                this->left = newNode;
             else
-                leftNode->insertNumber(value);
+                this->left->insertNumber(value);
         } else {
-            if(rightNode == nullptr)
-                rightNode = newNode;
+            if(this->right == nullptr)
+                this->right = newNode;
             else
-                rightNode->insertNumber(value);
+                this->right->insertNumber(value);
         }
     }
 
