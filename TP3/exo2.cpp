@@ -33,17 +33,35 @@ int binarySearch(Array& array, int toSearch) {
  * @param indexMax last index of the value to find
  */
 void binarySearchAll(Array& array, int toSearch, int& indexMin, int& indexMax) {
+    indexMin = indexMax = -1;
     int start = 0;
     int end = array.size();
-    int mid = (start+end)/2;
-    indexMin = indexMax = binarySearch(array, toSearch);
-
-    while(indexMin > start && array[indexMin-1]==toSearch) {
-        indexMin--;
+    while(start <= end) {
+        int mid = (start+end)/2;
+        int midValue = array[mid];
+        if(midValue<toSearch) {
+            start = mid + 1;
+        } else if (midValue>toSearch) {
+            end = mid - 1;
+        } else {
+            indexMin = mid;
+            end = mid - 1;
+        }
     }
 
-    while(indexMax < end && array[indexMax+1]==toSearch) {
-        indexMax++;
+    start = 0;
+    end = array.size()-1;
+    while(start <= end) {
+        int mid = (start+end)/2;
+        int midValue = array[mid];
+        if (midValue < toSearch) {
+            start = mid + 1;
+        } else if (midValue > toSearch) {
+            end = mid - 1;
+        } else {
+            indexMax = mid;
+            start = mid + 1;
+        }
     }
 }
 
