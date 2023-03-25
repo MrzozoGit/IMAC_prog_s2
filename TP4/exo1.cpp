@@ -47,12 +47,19 @@ void Heap::heapify(int heapSize, int nodeIndex) {
     }
 }
 
+// A REVOIR
 void Heap::buildHeap(Array& numbers) {
-
+    for(uint i=0; i<numbers.size(); i++) {
+        insertHeapNode(numbers.size(), numbers[i]);
+    }
 }
 
+// A REVOIR
 void Heap::heapSort() {
-
+    for(uint i=0; i<this->size(); i++) {
+        swap(0,i);
+        heapify(i, 0);
+    }
 }
 
 int main(int argc, char *argv[]) {

@@ -59,6 +59,14 @@ void processCharFrequences(string data, Array& frequences)
 
     // Your code
     frequences.fill(0);
+
+    for(uint i=0; i<frequences.size(); i++) {
+        int counter = 0;
+        for(uint y=0; y<data.length(); y++) {
+            if((uint)data[y] == i) counter++;
+        }
+        frequences[i] = counter;
+    }
 }
 
 void HuffmanHeap::insertHeapNode(int heapSize, HuffmanNode* newNode)
@@ -74,7 +82,11 @@ void HuffmanHeap::insertHeapNode(int heapSize, HuffmanNode* newNode)
 
     // Your code
     int i = heapSize;
-
+    (*this)[i] = newNode;
+    while((i>0) && this->get(i)->frequences < this->get((i-1)/2)->frequences) {
+        this->swap(i, (i-1)/2);
+        i = (i-1)/2;
+    }
 }
 
 void buildHuffmanHeap(const Array& frequences, HuffmanHeap& priorityMinHeap, int& heapSize)
@@ -87,7 +99,16 @@ void buildHuffmanHeap(const Array& frequences, HuffmanHeap& priorityMinHeap, int
 
     // Your code
     heapSize = 0;
-
+    uint i = heapSize;
+    for(i; i<frequences.size(); i++) {
+        if(frequences[i] != 0) {
+            HuffmanNode* tempNode = new HuffmanNode;
+            tempNode->frequences = frequences[i];
+            tempNode->character = i;
+            priorityMinHeap.insertHeapNode(heapSize, tempNode);
+            heapSize++;
+        }
+    }
 }
 
 void HuffmanHeap::heapify(int heapSize, int nodeIndex)
@@ -100,6 +121,27 @@ void HuffmanHeap::heapify(int heapSize, int nodeIndex)
      **/
     // Your code
 
+    // use (*this)[i] or this->get(i) to get a value at index i
+    /*int i_min = nodeIndex;
+
+    int parentValue = this->get(nodeIndex)->frequences;
+    int leftChildValue = this->get(nodeIndex)->left->get_value();
+    int rightChildValue = this->get(nodeIndex)->right->frequences;
+
+    qDebug("zzz: %i\n", leftChildValue);
+
+    if(leftChildValue<heapSize) {
+        i_min = (*this)[i_min]>(*this)[leftChildIndex] ? i_max : leftChildIndex;
+    }
+
+    if(rightChildValue<heapSize) {
+        i_min = (*this)[i_min]>(*this)[rightChildIndex] ? i_max : rightChildIndex;
+    }
+
+    if(nodeIndex != i_min) {
+        this->swap(nodeIndex, i_min);
+        this->heapify(heapSize, i_min);
+    }*/
 }
 
 
