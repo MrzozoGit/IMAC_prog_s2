@@ -3,6 +3,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <string>
+#include <math.h>
 
 #include <tp5.h>
 
@@ -11,8 +12,7 @@ using std::size_t;
 using std::string;
 
 
-std::vector<string> TP5::names(
-{
+std::vector<string> TP5::names({
     "Yolo", "Anastasiya", "Clement", "Sirine", "Julien", "Sacha", "Leo", "Margot",
     "JoLeClodo", "Anais", "Jolan", "Marie", "Cindy", "Flavien", "Tanguy", "Audrey",
     "Mr.PeanutButter", "Bojack", "Mugiwara", "Sully", "Solem",
@@ -20,15 +20,18 @@ std::vector<string> TP5::names(
     "Fanny", "Jeanne", "Elo"
 });
 
-unsigned long int hash(string key)
-{
-    // return an unique hash id from key
-    return 0;
+unsigned long int hash(string key) {
+    // return a unique hash id from key
+    uint hash_value = 0;
+
+    for(uint i = 0; i < key.size(); i++) {
+        hash_value += key[i] * pow(128, key.size()-1-i);
+    }
+
+    return hash_value;
 }
 
-struct MapNode : public BinaryTree
-{
-
+struct MapNode : public BinaryTree {
     string key;
     unsigned long int key_hash;
 
@@ -37,8 +40,7 @@ struct MapNode : public BinaryTree
     MapNode* left;
     MapNode* right;
 
-    MapNode(string key, int value) : BinaryTree (value)
-    {
+    MapNode(string key, int value) : BinaryTree (value) {
         this->key = key;
         this->value = value;
         this->key_hash = hash(key);
@@ -50,15 +52,34 @@ struct MapNode : public BinaryTree
      * @brief insertNode insert a new node according to the key hash
      * @param node
      */
-    void insertNode(MapNode* node)
-    {
-
+    void insertNode(MapNode* node) {
+        if(this->key_hash > node->key_hash) {
+            if(this->left == nullptr) {
+                this->left = node;
+            } else {
+                this->left->insertNode(node);
+            }
+        } else {
+            if(this->right == nullptr) {
+                this->right = node;
+            } else {
+                this->right->insertNode(node);
+            }
+        }
     }
 
-    void insertNode(string key, int value)
-    {
+    void insertNode(string key, int value) {
         this->insertNode(new MapNode(key, value));
     }
+
+//    int get(unsigned long int key_hash){
+//            if(this->key_hash == key_hash) return this->value;
+//            if(this->isLeaf()) return 0;
+//            if(this->key_hash > key_hash && this->left !=nullptr) return this->left->get(key_hash);
+//            if(this->right != nullptr) return this->right->get(key_hash);
+//        }
+
+
 
     virtual ~MapNode() {}
     QString toString() const override {return QString("%1:\n%2").arg(QString::fromStdString(key)).arg(value);}
@@ -66,8 +87,7 @@ struct MapNode : public BinaryTree
     Node* get_right_child() const {return right;}
 };
 
-struct Map
-{
+struct Map {
     Map() {
         this->root = nullptr;
     }
@@ -77,9 +97,11 @@ struct Map
      * @param key
      * @param value
      */
-    void insert(string key, int value)
-    {
-
+    void insert(string key, int value) {
+        if(this->root == nullptr)
+            this->root = new MapNode(key, value);
+        else
+            this->root->insertNode(key, value);
     }
 
     /**
@@ -87,25 +109,31 @@ struct Map
      * @param key
      * @return
      */
-    int get(string key)
-    {
-        return -1;
+    int get(string key) {
+        uint key_hash = hash(key);
+        if(this->root->key_hash == key_hash) {
+            return this->root->value;
+        } else {
+            if(this->root->key_hash > key_hash && this->root->left !=nullptr)
+                return this->get(this->root->left->key);
+            if(this->root->right != nullptr)
+                return this->get(this->root->right->key);
+            else
+                return 0;
+        }
     }
 
     MapNode* root;
 };
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     srand(time(NULL));
-	Map map;
+    Map map;
 
     map.insert("Yolo", 20);
-    for (std::string& name : TP5::names)
-    {
-        if (rand() % 3 == 0)
-        {
+    for (std::string& name : TP5::names) {
+        if (rand() % 3 == 0) {
             map.insert(name, rand() % 21);
         }
     }
