@@ -22,7 +22,7 @@ std::vector<string> TP5::names({
 
 unsigned long int hash(string key) {
     // return a unique hash id from key
-    uint hash_value = 0;
+    unsigned long int hash_value = 0;
 
     for(uint i = 0; i < key.size(); i++) {
         hash_value += key[i] * pow(128, key.size()-1-i);
@@ -72,14 +72,13 @@ struct MapNode : public BinaryTree {
         this->insertNode(new MapNode(key, value));
     }
 
-//    int get(unsigned long int key_hash){
-//            if(this->key_hash == key_hash) return this->value;
-//            if(this->isLeaf()) return 0;
-//            if(this->key_hash > key_hash && this->left !=nullptr) return this->left->get(key_hash);
-//            if(this->right != nullptr) return this->right->get(key_hash);
-//        }
-
-
+    int get(unsigned long int key_hash) {
+        if(this->key_hash == key_hash) return this->value;
+        if(this->isLeaf()) return 0;
+        if(this->key_hash > key_hash && this->left !=nullptr) return this->left->get(key_hash);
+        if(this->right != nullptr) return this->right->get(key_hash);
+        else return 0;
+    }
 
     virtual ~MapNode() {}
     QString toString() const override {return QString("%1:\n%2").arg(QString::fromStdString(key)).arg(value);}
