@@ -110,16 +110,18 @@ struct Map {
      */
     int get(string key) {
         uint key_hash = hash(key);
-        if(this->root->key_hash == key_hash) {
-            return this->root->value;
-        } else {
-            if(this->root->key_hash > key_hash && this->root->left !=nullptr)
-                return this->get(this->root->left->key);
-            if(this->root->right != nullptr)
-                return this->get(this->root->right->key);
-            else
-                return 0;
+        MapNode* root = this->root;
+
+        while(root && root->key_hash != key_hash) {
+            if(root->key_hash > key_hash) {
+                root = root->left;
+            } else {
+                root = root->right;
+            }
         }
+        if(!root) return -1;
+
+        return root->value;
     }
 
     MapNode* root;
